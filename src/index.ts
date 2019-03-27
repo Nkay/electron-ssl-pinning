@@ -36,6 +36,12 @@ function createVerificator(config: Config) {
   });
 
   return (request: CertificateVerifyProcRequest, callback: (verificationResult: number) => void) => {
+    const domainExistsInConfig = config.some((fp) => fp.domain === request.hostname);
+    if(!domainExistsInConfig) {
+      callback(-3);
+      return;
+    }
+    
     const fingerprints: Array<string> = []; 
     for (let cert = request.certificate; cert && cert !== cert.issuerCert; cert = cert.issuerCert) {
       fingerprints.push(cert.fingerprint);
